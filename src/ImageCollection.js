@@ -1,32 +1,64 @@
 import React, { Component } from 'react'
 import Image from './Image'
+import './ImageCollection.css'
 import axios from 'axios'
+import uuid from 'uuid/v4'
+import { getRandomDate } from './helperFuncs'
 
 
-const API_KEY = "LNxgNwd0dZYw3It0lLzXRi5yUSzumi7i1Ayigys5"
+const API_KEY = "gGgx7Gx1BYZE5gFL9ghhbXwFteS83IIAgPGMY9gO"
+// "LNxgNwd0dZYw3It0lLzXRi5yUSzumi7i1Ayigys5"
 const API_BASE_URL = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`
+const START_DATE = 2000
 
 class ImageCollection extends Component {
+    static defaultProps = {
+        numImagesToGet: 2
+    }
     constructor(props) {
         super(props)
         this.state = {
             images: [],
             is_loaded: false,
         }
+        this.getImage = this.getImage.bind(this)
+        this.vote = this.vote.bind(this)
     }
 
-    async componentDidMount() {
-        let start = new Date().setFullYear(2000)
-        let end = new Date()
-        let unform_date = new Date(start + Math.random() * (end - start))
-        let year = unform_date.getFullYear()
-        let month = unform_date.getMonth() + 1
-        let date = unform_date.getDate()
-        let imgObj = await axios.get(`${API_BASE_URL}&date=${year}-${month}-${date}`)
+    componentDidMount() {
+        // Query the API the given number of times, and return an image object
+        for (let i = 0; i < this.props.numImagesToGet; i++) {
+            this.getImage()
+        }
+        this.setState({ is_loaded: true })
+    }
+
+    async getImage() {
+        // Make API call to NASA APOD with a random date to return an image object
+        // using the getRandomDate helper function
+        let imgObj = await axios.get(`${API_BASE_URL}&date=${getRandomDate(START_DATE)}`)
         let imgData = imgObj.data
 
         this.setState(prevState => ({
-            images: [ ...prevState.images, { id: imgData.url, url: imgData.url, title: imgData.title, explanation: imgData.explanation } ]
+            images: [
+                ...prevState.images,
+                {
+                    id: uuid(),
+                    url: imgData.url,
+                    title: imgData.title,
+                    explanation: imgData.explanation,
+                    votes: 0,
+                }
+            ]
+        }))
+    }
+
+    vote(id, delta) {
+        // Make a copy of the images array with the updated vote count
+        this.setState(prevState => ({
+            images: prevState.images.map(img =>
+                img.id === id ? { ...img, votes: img.votes + delta } : img
+            )
         }))
     }
 
@@ -37,11 +69,18 @@ class ImageCollection extends Component {
                 url={img.url}
                 title={img.title}
                 expl={img.explanation}
+                votes={img.votes}
+                vote={this.vote}
             />
         ))
+
         return (
             <div className="ImageCollection">
-                {images}
+                <div className="ImageCollection-images">
+                    {images}
+                </div>
+                <button
+                    className="ImageCollection-btn" onClick={this.getImage}>Click Me!</button>
             </div>
         )
     }

@@ -47,8 +47,8 @@ class ImageCollection extends Component {
                     url: imgData.url,
                     title: imgData.title,
                     explanation: imgData.explanation,
-                    votes: 0,
-                    stdDev: null,
+                    votes: null,
+                    stdDev: 0,
                 }
             ]
         }))
@@ -70,7 +70,6 @@ class ImageCollection extends Component {
 
     setVoteSD() {
         let sd = getSD(this.state.images.map(img => img.votes))
-        console.log(sd)
         return sd
     }
 

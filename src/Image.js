@@ -36,7 +36,7 @@ class Image extends Component {
         let { stdDev, votes, mean } = this.props
         let diff = votes - mean
 
-        if (stdDev === null) {
+        if (votes === null) {
             return { color: '#000' }
         } else if (diff > (1.3 * stdDev)) {
             return { color: '#4caf50' }

@@ -18,40 +18,52 @@ class ImageCollection extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            images: [],
-            is_loaded: false,
+            images: JSON.parse(window.localStorage.getItem("images") || "[]"),
+            is_loading: true,
         }
-        this.getImage = this.getImage.bind(this)
+        this.getImages = this.getImages.bind(this)
         this.vote = this.vote.bind(this)
+        this.viewedImages = new Set(this.state.images.map(img => img.url))
     }
 
     componentDidMount() {
-        // Query the API the given number of times, and return an image object
-        for (let i = 0; i < this.props.numImagesToGet; i++) {
-            this.getImage()
+        if (this.state.images.length < this.props.numImagesToGet) {
+            this.getImages()
+        } else {
+            this.setState({ is_loading: false })
         }
-        this.setState({ is_loaded: true })
     }
 
-    async getImage() {
-        // Make an API call to NASA APOD with a random date to return an image object
-        // using the getRandomDate helper function
-        let imgObj = await axios.get(`${API_BASE_URL}&date=${getRandomDate(START_DATE)}`)
-        let imgData = imgObj.data
+    async getImages() {
+        try {
+            let images = []
+            // Make an API call to NASA APOD with a random date to return an image object
+            // using the getRandomDate helper function
 
-        this.setState(prevState => ({
-            images: [
-                ...prevState.images,
-                {
-                    id: uuid(),
-                    url: imgData.url,
-                    title: imgData.title,
-                    explanation: imgData.explanation,
-                    votes: null,
-                    stdDev: 0,
+            while (images.length < this.props.numImagesToGet) {
+                let imgObj = await axios.get(`${API_BASE_URL}&date=${getRandomDate(START_DATE)}`, {
+                    headers: { Accept: "application/json" }
+                })
+                let imgData = imgObj.data
+
+                if (!this.viewedImages.has(imgData.url)) {
+                    images.push({
+                        id: uuid(),
+                        url: imgData.url,
+                        title: imgData.title,
+                        explanation: imgData.explanation,
+                        votes: null,
+                        stdDev: 0,
+                    })
                 }
-            ]
-        }))
+            }
+            this.setState({ images: images, is_loading: false })
+            window.localStorage.setItem("images", JSON.stringify(images))
+
+        } catch (err) {
+            alert(err)
+            this.setState({ is_loading: true })
+        }
     }
 
     vote(id, delta) {
@@ -66,6 +78,10 @@ class ImageCollection extends Component {
             images: prevState.images.map((img) => (
                 { ...img, stdDev: this.setVoteSD() }))
         }))
+
+        let images = this.state.images.map(img => img)
+
+        window.localStorage.setItem("images", JSON.stringify(images))
     }
 
     setVoteSD() {
@@ -89,11 +105,16 @@ class ImageCollection extends Component {
 
         return (
             <div className="ImageCollection">
-                <div className="ImageCollection-images">
-                    {images}
-                </div>
-                <button
-                    className="ImageCollection-btn" onClick={this.getImage}>Click Me!</button>
+                {this.state.is_loading ? <div className="loader">Loading...</div>
+                    : (
+                        <div>
+                            <div className="ImageCollection-images">
+                                {images}
+                            </div>
+                            <button className="ImageCollection-btn" onClick={this.getImages}>Click Me!</button>
+                        </div>
+                    )
+                }
             </div>
         )
     }

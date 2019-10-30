@@ -34,20 +34,22 @@ class Image extends Component {
 
     getStyles() {
         let stdDev = this.props.stdDev
-        if (stdDev > 10) {
-            return { fontSize: '3rem', color: '#4caf50' }
-        } else if (stdDev > 7) {
-            return { fontSize: '2.5rem', color: '#cddc39' }
+        if (stdDev === null) {
+            return { color: '#000' }
+        } else if (stdDev > 10) {
+            return { color: '#4caf50' }
         } else if (stdDev > 5) {
-            return { fontSize: '2rem', color: '#ffeb3b' }
+            return { color: '#cddc39' }
         } else if (stdDev > 2) {
-            return { fontSize: '1.8rem', color: '#ffc107' }
-        } else if (stdDev > 0) {
-            return { fontSize: '1.5rem', color: '#ff9800' }
-        } else if (stdDev === null) {
-            return { fontSize: '1.2rem', color: '#000' }
+            return { color: '#ffeb3b' }
+        } else if (stdDev >= 0) {
+            return { color: '#ffc107' }
+        } else if (stdDev > -2) {
+            return { color: '#ff9800' }
+        } else if (stdDev > -5) {
+            return { color: '#a30202' }
         } else {
-            return { fontSize: '.8rem', color: '#f44336' }
+            return { color: '#6b1313' }
         }
     }
 

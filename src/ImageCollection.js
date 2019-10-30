@@ -13,7 +13,7 @@ const START_DATE = 2000
 
 class ImageCollection extends Component {
     static defaultProps = {
-        numImagesToGet: 2
+        numImagesToGet: 5
     }
     constructor(props) {
         super(props)
@@ -62,16 +62,15 @@ class ImageCollection extends Component {
             )
         }))
 
-        let mean = getMean(this.state.images.map(x => x.votes))
-
         this.setState(prevState => ({
             images: prevState.images.map((img) => (
-                { ...img, stdDev: img.votes >= mean ? this.setVoteSD() : -this.setVoteSD() }))
+                { ...img, stdDev: this.setVoteSD() }))
         }))
     }
 
     setVoteSD() {
         let sd = getSD(this.state.images.map(img => img.votes))
+        console.log(sd)
         return sd
     }
 
@@ -85,6 +84,7 @@ class ImageCollection extends Component {
                 votes={img.votes}
                 vote={this.vote}
                 stdDev={img.stdDev}
+                mean={getMean(this.state.images.map(img => img.votes))}
             />
         ))
 

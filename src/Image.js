@@ -33,20 +33,22 @@ class Image extends Component {
     }
 
     getStyles() {
-        let stdDev = this.props.stdDev
+        let { stdDev, votes, mean } = this.props
+        let diff = votes - mean
+
         if (stdDev === null) {
             return { color: '#000' }
-        } else if (stdDev > 10) {
+        } else if (diff > (1.3 * stdDev)) {
             return { color: '#4caf50' }
-        } else if (stdDev > 5) {
+        } else if (diff > (1 * stdDev)) {
             return { color: '#cddc39' }
-        } else if (stdDev > 2) {
+        } else if (diff > (.5 * stdDev)) {
             return { color: '#ffeb3b' }
-        } else if (stdDev >= 0) {
+        } else if (diff > 0) {
             return { color: '#ffc107' }
-        } else if (stdDev > -2) {
+        } else if (diff > (-1 * stdDev)) {
             return { color: '#ff9800' }
-        } else if (stdDev > -5) {
+        } else if (diff > (-2 * stdDev)) {
             return { color: '#a30202' }
         } else {
             return { color: '#6b1313' }

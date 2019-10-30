@@ -3,7 +3,7 @@ import Image from './Image'
 import './ImageCollection.css'
 import axios from 'axios'
 import uuid from 'uuid/v4'
-import { getRandomDate } from './helperFuncs'
+import { getRandomDate, getSD, getMean } from './helperFuncs'
 
 
 const API_KEY = "gGgx7Gx1BYZE5gFL9ghhbXwFteS83IIAgPGMY9gO"
@@ -34,7 +34,7 @@ class ImageCollection extends Component {
     }
 
     async getImage() {
-        // Make API call to NASA APOD with a random date to return an image object
+        // Make an API call to NASA APOD with a random date to return an image object
         // using the getRandomDate helper function
         let imgObj = await axios.get(`${API_BASE_URL}&date=${getRandomDate(START_DATE)}`)
         let imgData = imgObj.data
@@ -48,6 +48,7 @@ class ImageCollection extends Component {
                     title: imgData.title,
                     explanation: imgData.explanation,
                     votes: 0,
+                    stdDev: null,
                 }
             ]
         }))
@@ -60,6 +61,18 @@ class ImageCollection extends Component {
                 img.id === id ? { ...img, votes: img.votes + delta } : img
             )
         }))
+
+        let mean = getMean(this.state.images.map(x => x.votes))
+
+        this.setState(prevState => ({
+            images: prevState.images.map((img) => (
+                { ...img, stdDev: img.votes >= mean ? this.setVoteSD() : -this.setVoteSD() }))
+        }))
+    }
+
+    setVoteSD() {
+        let sd = getSD(this.state.images.map(img => img.votes))
+        return sd
     }
 
     render() {
@@ -71,6 +84,7 @@ class ImageCollection extends Component {
                 expl={img.explanation}
                 votes={img.votes}
                 vote={this.vote}
+                stdDev={img.stdDev}
             />
         ))
 

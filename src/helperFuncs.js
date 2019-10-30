@@ -10,4 +10,25 @@ function getRandomDate(startYear) {
     return randDate;
 }
 
-export { getRandomDate }
+function sum(array) {
+    return array.reduce((accumulator, currValue) => accumulator + currValue);
+}
+
+function getMean(array) {
+    return sum(array) / array.length;
+}
+
+function getSD(array) {
+    // Calculat the Standard Deviation
+    let mean = getMean(array);
+    let squaredDiffs = array.map(x => Math.pow((x - mean), 2));
+    let meanOfSquaredDiffs = (sum(squaredDiffs) / (squaredDiffs.length - 1));
+    let sd = Math.sqrt(meanOfSquaredDiffs);
+    return sd
+}
+
+export {
+    getRandomDate,
+    getSD,
+    getMean,
+}

@@ -1,4 +1,8 @@
 .Image {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
     max-width: 300px;
     margin: 10px;
 }
@@ -20,4 +24,17 @@
     background-color: black;
     width: 90%;
     z-index: 100;
+}
+
+.fa-arrow-alt-circle-up,
+.fa-arrow-alt-circle-down {
+    font-size: 2rem;
+    margin: 5px;
+}
+
+.Image-votes {
+    display: flex;
+    width: 50%;
+    justify-content: space-between;
+    align-items: center;
 }

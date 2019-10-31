@@ -85,7 +85,7 @@ class ImageCollection extends Component {
     }
 
     setVoteSD() {
-        let sd = getSD(this.state.images.map(img => img.votes))
+        let sd = getSD(this.state.images.map(img => img.votes > 0 && img.votes))
         return sd
     }
 
@@ -107,12 +107,14 @@ class ImageCollection extends Component {
             <div className="ImageCollection">
                 {this.state.is_loading ? <div className="loader">Loading...</div>
                     : (
-                        <div>
+                        <>
                             <div className="ImageCollection-images">
                                 {images}
                             </div>
-                            <button className="ImageCollection-btn" onClick={this.getImages}>Click Me!</button>
-                        </div>
+                            <button className="ImageCollection-btn" onClick={this.getImages}>
+                                <i class="fas fa-meteor"> 3, 2, 1...</i>
+                            </button>
+                        </>
                     )
                 }
             </div>
